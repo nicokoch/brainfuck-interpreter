@@ -23,6 +23,8 @@ Small TODOs
 * Input parameter array size
 * Clean up code
 * Version string
+* Test cases
+* Maybe benchmarking options (or any kind of performance test -> instructions/second?)
 * Anything else you can come up with
 
 Contributing
