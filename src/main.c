@@ -7,10 +7,10 @@
 void show_help()
 {
 	const char* help_text="Brainfuck interpreter by Nicolas Koch\n"
-					 "Syntax: brainfuck-interpreter [-vh] bf-filename\n"
-					 "Options:\n"
-					 "\t-h: show this help\n"
-					 "\t-v: show version information\n";
+					      "Syntax: brainfuck-interpreter [-vh] bf-filename\n"
+					      "Options:\n"
+					      "\t-h: show this help\n"
+					      "\t-v: show version information\n";
     printf("%s", help_text);
 }
 
