@@ -15,9 +15,9 @@ $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 brainfuck-interpreter: $(OBJ)
-	gcc -o $@ $^ $(CFLAGS)
+	gcc -o ../$@ $^ $(CFLAGS)
 
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ brainfuck-interpreter
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ ../brainfuck-interpreter

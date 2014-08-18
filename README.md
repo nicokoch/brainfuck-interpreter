@@ -16,6 +16,7 @@ Big TODOs
 * Interactive mode (similar to the cpython interpreter)
 * -c option to compile the code
 * Option to enable dynamically sized array (also implement a dynamically sized array)
+* optimizations (i.e. batch shifting/incrementing)
 
 Small TODOs
 -----------
