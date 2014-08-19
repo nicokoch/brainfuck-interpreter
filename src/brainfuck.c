@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "brainfuck.h"
+#include "optimize.h"
 
 /*
  * Pretty print the current brainfuck array

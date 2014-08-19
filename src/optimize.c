@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stdlib.h>
-#include "brainfuck.h"
 #include "optimize.h"
 
 /*
