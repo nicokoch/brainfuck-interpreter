@@ -152,7 +152,11 @@ char* bf_read_file(char* filename)
       buffer = malloc(length);
       if (buffer)
       {
-        fread (buffer, 1, length, f);
+        int read_bytes = fread(buffer, 1, length, f);
+        if(read_bytes != length){
+			fprintf(stderr, "Error while reading file: %s\n", filename);
+			return NULL;
+		}
       }
       fclose (f);
       return buffer;
