@@ -88,7 +88,8 @@ void deal_with_error(char* prog_code, int code_index, CELL* prog_array, CELL* pt
 /*
  * O(n) function to get matching brackets -> TODO: replace this with a stack data structure
  */
-int get_matching_close_index(char* string, int index){
+int get_matching_close_index(char* string, int index)
+{
     if(string[index] != '['){
         fprintf(stderr, "Interpreter error: char at position %d does not equal '['\n", index);
         return -ERROR_INTERN;
@@ -112,7 +113,8 @@ int get_matching_close_index(char* string, int index){
     return -ERROR_SYNTAX;
 }
 
-int get_matching_open_index(char* string, int index){
+int get_matching_open_index(char* string, int index)
+{
     if(string[index] != ']'){
         fprintf(stderr, "Interpreter error: char at position %d does not equal ']'\n", index);
         return -ERROR_INTERN;
@@ -178,14 +180,33 @@ char* bf_read_file_and_minimize(char* filename)
 }
 
 /*
+ * Create an empty program array
+ */
+CELL* bf_create_array(int arr_size)
+{
+	CELL* result = malloc(arr_size * sizeof(CELL));
+	memset(result, '\0', arr_size); //suck it, calloc
+	return result;
+}
+
+void bf_destroy_array(CELL* prog_array){
+	free(prog_array);
+}
+
+/*
  * Execute brainfuck code: this is still very inefficient.
  * TODO: Optimizations, check array bounds?, dynamic array size?
+ * 
+ * Method signature changed on 19.08.2014 to enable interactive mode support
+ * 
+ * @args:	program: the bf code to execute
+ * 			prog_array: the current program array (get it from bf_create_array)
+ * 			ptr: the current instruction pointer (in full execution mode declare it like CELL* ptr = prog_array)
+ * 
+ * @returns: The resulting instruction pointer
  */
-int bf_execute(char* program)
+CELL* bf_execute(char* program, CELL* prog_array, CELL* ptr)
 {
-    CELL prog_array[DEFAULT_ARRAY_SIZE];
-    memset(prog_array, '\0', DEFAULT_ARRAY_SIZE);
-    CELL* ptr = prog_array;
     int i=0;
     int prev_i;
     while(i < strlen(program)){
@@ -223,8 +244,9 @@ int bf_execute(char* program)
         }
         if(i < 0){
             deal_with_error(program,prev_i,prog_array, ptr);
+            return NULL;
         }
         i++;
     }
-    return 0;
+    return ptr;
 }

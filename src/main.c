@@ -4,11 +4,13 @@
 #include <unistd.h>
 #include "brainfuck.h"
 #include "optimize.h"
+#include "shell.h"
 
 void show_help()
 {
     const char* help_text="Brainfuck interpreter by Nicolas Koch\n"
                           "Syntax: brainfuck-interpreter [-vh] bf-filename\n"
+                          "Without arguments, this program will run in interactive mode. In this case type \"help\" for more information.\n"
                           "Options:\n"
                           "\t-h: show this help\n"
                           "\t-v: show version information\n"
@@ -24,13 +26,16 @@ void show_version()
 int main(int argc, char** argv) {
     char *opt_filename = NULL;
     int opt_flag_minimize = 0;
+    int opt_flag_interactive = 0;
     
     int index;
     int c;
 
     opterr = 0;
-
-    while ((c = getopt (argc, argv, "hvm")) != -1)
+	if(argc == 1){ //no arguments -> run interactive
+		opt_flag_interactive = 1;
+	}
+    while ((c = getopt (argc, argv, "hvm")) != -1){
         switch (c)
         {
         case 'h':
@@ -51,13 +56,14 @@ int main(int argc, char** argv) {
                          optopt);
             return 1;
         }
+	}
 
     for (index = optind; index < argc; index++){
         if (index == argc-1){
             opt_filename = argv[index];
         }
     }
-    if(!opt_filename){
+    if(!opt_filename && !opt_flag_interactive){
         fprintf(stderr, "No filename given. Try -h for more information\n");
         return 1;
     }
@@ -68,15 +74,20 @@ int main(int argc, char** argv) {
         printf("%s\n",program_string);
         free(program_string);
     }
+    else if (opt_flag_interactive){ //run in interactive mode
+		run_brainfuck_shell();
+	}
     else{ //execute the file
-        char* program_string = bf_read_file(opt_filename);
-        if(!program_string){
-            fprintf(stderr, "File not found: %s\n", opt_filename);
+        char* program_string = bf_read_file_and_minimize(opt_filename);
+        if(!program_string){ //error
             return 1;
         }
-        int exec_error = bf_execute(program_string);
+        CELL* prog_array = bf_create_array(DEFAULT_ARRAY_SIZE);
+        CELL* ptr = prog_array;
+        ptr = bf_execute(program_string, prog_array, ptr);
+        bf_destroy_array(prog_array);
         free(program_string);
-        if(exec_error){
+        if(!ptr){ //error
             fprintf(stderr, "An error occured during execution\n");
             return 1;
         }

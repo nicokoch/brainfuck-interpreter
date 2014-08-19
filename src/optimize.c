@@ -8,7 +8,7 @@
  */
 char* bf_minimize_file(char* file_string)
 {
-    char* valid_chars = "<>.,+-[]";
+    const char* valid_chars = "<>.,+-[]";
     int i;
     int insert_pos = 0;
     for(i=0; i<strlen(file_string); i++){

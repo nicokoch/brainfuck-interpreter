@@ -10,6 +10,10 @@
 #define ERROR_INTERN 1
 #define ERROR_SYNTAX 2
 
-int bf_execute(char* program);
+CELL* bf_execute(char* program, CELL* prog_array, CELL* ptr);
 char* bf_read_file(char* filename);
+char* bf_read_file_and_minimize(char* filename);
+char* bf_create_array(int arr_size);
+void bf_destroy_array(char* array);
+void print_current_state(CELL *prog_array, CELL* ptr, int arr_size);
 #endif // BRAINFUCK_H

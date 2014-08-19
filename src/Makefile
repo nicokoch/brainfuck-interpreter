@@ -4,10 +4,10 @@ CFLAGS=-I$(IDIR) -O3 -Wall
 
 ODIR=.
 
-_DEPS = brainfuck.h optimize.h
+_DEPS = brainfuck.h optimize.h shell.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o brainfuck.o optimize.o
+_OBJ = main.o brainfuck.o optimize.o shell.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
