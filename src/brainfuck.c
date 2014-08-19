@@ -167,10 +167,10 @@ char* bf_read_file(char* filename)
  */
 char* bf_read_file_and_minimize(char* filename)
 {
-	char* file_contents = bf_read_file(filename);
-	if(!file_contents) return NULL;
-	file_contents = bf_minimize_file(file_contents);
-	return file_contents;
+    char* file_contents = bf_read_file(filename);
+    if(!file_contents) return NULL;
+    file_contents = bf_minimize_file(file_contents);
+    return file_contents;
 }
 
 /*
