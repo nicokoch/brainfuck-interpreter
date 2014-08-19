@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include "brainfuck.h"
 
+/*
+ * Pretty print the current brainfuck array
+ */
 void print_current_state(CELL *prog_array, CELL* ptr, int arr_size)
 {
     int ptr_index = ptr - prog_array;
@@ -36,6 +39,9 @@ void print_current_state(CELL *prog_array, CELL* ptr, int arr_size)
     fprintf(stderr, "\n");
 }
 
+/*
+ * Pretty print the code position of an error
+ */
 void print_code_position(char* prog_code, int code_pos){
     int code_len = strlen(prog_code);
 
@@ -68,6 +74,19 @@ void print_code_position(char* prog_code, int code_pos){
     fprintf(stderr, "^\n");
 }
 
+/*
+ * High level function to deal with brainfuck programming errors
+ */
+void deal_with_error(char* prog_code, int code_index, CELL* prog_array, CELL* ptr)
+{
+    fprintf(stderr, "Current BRAINFUCK stack:\n");
+    print_current_state(prog_array, ptr, DEFAULT_ARRAY_SIZE);
+    print_code_position(prog_code, code_index);
+}
+
+/*
+ * O(n) function to get matching brackets -> TODO: replace this with a stack data structure
+ */
 int get_matching_close_index(char* string, int index){
     if(string[index] != '['){
         fprintf(stderr, "Interpreter error: char at position %d does not equal '['\n", index);
@@ -116,13 +135,9 @@ int get_matching_open_index(char* string, int index){
     return -ERROR_SYNTAX;
 }
 
-void deal_with_error(char* prog_code, int code_index, CELL* prog_array, CELL* ptr)
-{
-    fprintf(stderr, "Current BRAINFUCK stack:\n");
-    print_current_state(prog_array, ptr, DEFAULT_ARRAY_SIZE);
-    print_code_position(prog_code, code_index);
-}
-
+/*
+ * Read a file into heap string
+ */
 char* bf_read_file(char* filename)
 {
     char* buffer = 0;
@@ -146,6 +161,21 @@ char* bf_read_file(char* filename)
     }
 }
 
+/*
+ * Read the file, then remove non-brainfuck characters, effectively minimizing the file
+ */
+char* bf_read_file_and_minimize(char* filename)
+{
+	char* file_contents = bf_read_file(filename);
+	if(!file_contents) return NULL;
+	file_contents = bf_minimize_file(file_contents);
+	return file_contents;
+}
+
+/*
+ * Execute brainfuck code: this is still very inefficient.
+ * TODO: Optimizations, check array bounds?, dynamic array size?
+ */
 int bf_execute(char* program)
 {
     CELL prog_array[DEFAULT_ARRAY_SIZE];
@@ -193,4 +223,3 @@ int bf_execute(char* program)
     }
     return 0;
 }
-
