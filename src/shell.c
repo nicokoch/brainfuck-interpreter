@@ -28,7 +28,7 @@ int run_brainfuck_shell()
     CELL* ptr = prog_array;
     char buffer[SHELL_BUFFER_LENGTH];
     while(buffer[0] != SHELL_QUIT_CHAR){
-		memset(buffer, '\0', SHELL_BUFFER_LENGTH);
+        memset(buffer, '\0', SHELL_BUFFER_LENGTH);
         printf(">>> ");
         fgets(buffer, SHELL_BUFFER_LENGTH, stdin);
         if(strcmp(buffer, SHELL_HELP) == 0){
@@ -36,10 +36,10 @@ int run_brainfuck_shell()
         }
         else{
             ptr = bf_execute(buffer, prog_array, ptr);
-			if(!ptr){
-				ptr = prog_array;
-			}
-			//print_current_state(prog_array, ptr, DEFAULT_ARRAY_SIZE);
+            if(!ptr){
+                ptr = prog_array;
+            }
+            //print_current_state(prog_array, ptr, DEFAULT_ARRAY_SIZE);
         }
     }
     return 0;
