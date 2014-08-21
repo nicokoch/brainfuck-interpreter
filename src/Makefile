@@ -10,7 +10,6 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = main.o brainfuck.o optimize.o shell.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include "brainfuck.h"
 #include "optimize.h"
 #include "shell.h"
@@ -91,6 +92,5 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	}
-
 	return 0;
 }
