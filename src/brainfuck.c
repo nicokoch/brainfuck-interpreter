@@ -162,7 +162,8 @@ char *bf_read_file(char *filename)
 		fseek(f, 0, SEEK_END);
 		length = ftell(f);
 		fseek(f, 0, SEEK_SET);
-		buffer = malloc(length);
+		buffer = malloc(length+1);
+		memset(buffer, '\0', length+1);
 		if (buffer) {
 			int read_bytes = fread(buffer, 1, length, f);
 			if (read_bytes != length) {
