@@ -90,6 +90,64 @@ void deal_with_error(char *prog_code, int code_index, CELL * prog_array,
 	print_code_position(prog_code, code_index);
 }
 
+
+#if USING_COMMAND_STRUCTURE
+/*
+ * Command types: "+" , "-" , ">" , "<" , "[" , "," , "." , "S" (S = start)
+ * 
+ * Example Command Structure
+ * String: "++[->+<]>
+ * Struct:
+              '+' -> '+' -> '['                ->                  '>'
+                            'S' -> '-' -> '>' -> '+' -> '<' -> ']'
+ * In the diagram, a -> represents next_command and a command below another one represented child_command and parent_command
+ */
+struct Command{
+    char type;
+    struct Command *parent_command;
+    struct Command *next_command;
+    struct Command *child_command; //Used only if type=='['. Child command is guarenteed to have type of 'S'
+};
+struct Command *new_command(char type, struct Command *parent){
+    struct Command *comm = malloc(sizeof(struct Command));
+    comm->type = type;
+    comm->parent_command = parent;
+    comm->next_command = NULL;
+    comm->child_command = NULL;
+    return comm;
+}
+
+/*
+ * This function converts a string of code into a stack data structure (Command)
+ * Precondition: The code is minimized and balanced
+ */
+struct Command *build_command_struct(char *code){
+    int code_len = strlen(code);
+    
+    struct Command *head = new_command('S', NULL); //Static, reamins as head
+    struct Command *comm = head; //Moves around as the current command
+    
+    for (int i = 0; i < code_len; i++) {
+        struct Command *next = new_command(code[i], comm->parent_command);
+        comm->next_command = next;
+        comm = next;
+        
+        if(comm->type == '['){
+            struct Command *child = new_command('S', comm);
+            child->parent_command = comm;
+            comm->child_command = child;
+            comm = child;
+        }
+        else if(comm->type == ']'){
+            comm = comm->parent_command;
+        }
+    }
+    
+    return head;
+}
+
+#else //USING_COMMAND_STRUCTURE
+
 /*
  * O(n) function to get matching brackets -> TODO: replace this with a stack data structure
  */
@@ -148,6 +206,8 @@ int get_matching_open_index(char *string, int index)
 		index);
 	return -ERROR_SYNTAX;
 }
+
+#endif //USING_COMMAND_STRUCTURE
 
 /*
  * Read a file into heap string
@@ -220,8 +280,54 @@ void bf_destroy_array(CELL * prog_array)
  * 
  * @returns: The resulting instruction pointer
  */
+
+
 CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
 {
+#if USING_COMMAND_STRUCTURE
+    
+    struct Command *command_struct = build_command_struct(program);
+
+    while (command_struct->next_command) {
+        command_struct = command_struct->next_command;
+        switch (command_struct->type) {
+            case '+':
+                ++*ptr;
+                break;
+            case '-':
+                --*ptr;
+                break;
+            case '>':
+                ptr++;
+                break;
+            case '<':
+                ptr--;
+                break;
+            case '.':
+                putchar(*ptr);
+                break;
+            case ',':
+                *ptr = getchar();
+                break;
+            case '[':
+                if(*ptr != 0){
+                    command_struct = command_struct->child_command;
+                }
+                break;
+            case ']':
+                if(*ptr != 0){
+                    command_struct = command_struct->parent_command->child_command; //Return to the 'S'
+                }
+                else{
+                    command_struct = command_struct->parent_command; 
+                }
+            default:
+                break;
+        }
+    }
+    
+#else //USING_COMMAND_STRUCTURE
+    
 	int i = 0;
 	int prev_i;
 	while (i < strlen(program)) {
@@ -263,5 +369,7 @@ CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
 		}
 		i++;
 	}
+    
+#endif //USING_COMMAND_STRUCTURE
 	return ptr;
 }
