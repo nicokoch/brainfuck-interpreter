@@ -10,6 +10,8 @@
 #define ERROR_INTERN 1
 #define ERROR_SYNTAX 2
 
+#define USING_COMMAND_STRUCTURE 1
+
 CELL* bf_execute(char* program, CELL* prog_array, CELL* ptr);
 char* bf_read_file(char* filename);
 char* bf_read_file_and_minimize(char* filename);
