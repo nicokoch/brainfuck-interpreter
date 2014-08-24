@@ -98,12 +98,13 @@ void deal_with_error(char *prog_code, int code_index, CELL * prog_array,
  * Example Command Structure
  * String: "++[->+<]>
  * Struct:
-              '+' -> '+' -> '['                ->                  '>'
-                            'S' -> '-' -> '>' -> '+' -> '<' -> ']'
- * In the diagram, a -> represents next_command and a command below another one represented child_command and parent_command
+       'S' -> '+',2 -> '['                ->                  '>'
+                       'S' -> '-' -> '>' -> '+' -> '<' -> ']'
+ * In the diagram, a -> represents next_command and a command below another one represented child_command and parent_command, and the '+',2 means a '+' command with a magnitude of 2
  */
 struct Command{
     char type;
+    int magnitude;
     struct Command *parent_command;
     struct Command *next_command;
     struct Command *child_command; //Used only if type=='['. Child command is guarenteed to have type of 'S'
@@ -111,6 +112,7 @@ struct Command{
 struct Command *new_command(char type, struct Command *parent){
     struct Command *comm = malloc(sizeof(struct Command));
     comm->type = type;
+    comm->magnitude = 1;
     comm->parent_command = parent;
     comm->next_command = NULL;
     comm->child_command = NULL;
@@ -128,6 +130,15 @@ struct Command *build_command_struct(char *code){
     struct Command *comm = head; //Moves around as the current command
     int i = 0;
     for (i = 0; i < code_len; i++) {
+        // Quick optimization for the commands '+','-','>','<'
+        // If they are repeated over and over again then instead of making a new command, just increase the magnitude of the previous command.
+        if((i != 0) && (code[i] == code[i-1]) &&
+           (code[i] == '+' || code[i] == '-' || code[i] == '>' || code[i] == '<')){
+            comm->magnitude++;
+            continue;
+        }
+        
+        // If no optimization then create a new command struct with the same parent as the previous
         struct Command *next = new_command(code[i], comm->parent_command);
         comm->next_command = next;
         comm = next;
@@ -292,16 +303,16 @@ CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
         command_struct = command_struct->next_command;
         switch (command_struct->type) {
             case '+':
-                ++*ptr;
+                *ptr += command_struct->magnitude;
                 break;
             case '-':
-                --*ptr;
+                *ptr -= command_struct->magnitude;
                 break;
             case '>':
-                ptr++;
+                ptr += command_struct->magnitude;
                 break;
             case '<':
-                ptr--;
+                ptr -= command_struct->magnitude;
                 break;
             case '.':
                 putchar(*ptr);
