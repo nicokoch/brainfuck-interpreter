@@ -126,8 +126,8 @@ struct Command *build_command_struct(char *code){
     
     struct Command *head = new_command('S', NULL); //Static, reamins as head
     struct Command *comm = head; //Moves around as the current command
-    
-    for (int i = 0; i < code_len; i++) {
+    int i = 0;
+    for (i = 0; i < code_len; i++) {
         struct Command *next = new_command(code[i], comm->parent_command);
         comm->next_command = next;
         comm = next;
