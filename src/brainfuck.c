@@ -156,7 +156,19 @@ struct Command *build_command_struct(char *code){
     return head;
 }
 
-
+/*
+ * Free the memory of a command struct linked list created by build_command_struct()
+ */ 
+void destroy_command_struct(struct Command* head)
+{
+	if(head->child_command){
+		destroy_command_struct(head->child_command);
+	}
+	if(head->next_command){
+		destroy_command_struct(head->next_command);
+	}
+	free(head);
+}
 /*
  * Read a file into heap string
  */
@@ -234,7 +246,7 @@ CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
 {
     
     struct Command *command_struct = build_command_struct(program);
-
+	struct Command *head = command_struct;
     while (command_struct->next_command) {
         command_struct = command_struct->next_command;
         switch (command_struct->type) {
@@ -272,6 +284,6 @@ CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
                 break;
         }
     }
-    
+    destroy_command_struct(head);
 	return ptr;
 }
