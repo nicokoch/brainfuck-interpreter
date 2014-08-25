@@ -11,7 +11,8 @@ char *bf_minimize_file(char *file_string)
 	const char *valid_chars = "<>.,+-[]";
 	int i;
 	int insert_pos = 0;
-	for (i = 0; i < strlen(file_string); i++) {
+	int code_length = strlen(file_string);
+	for (i = 0; i < code_length; i++) {
 		char current_char = file_string[i];
 		if (strchr(valid_chars, current_char)) {
 			//character is valid
