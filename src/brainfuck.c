@@ -91,7 +91,6 @@ void deal_with_error(char *prog_code, int code_index, CELL * prog_array,
 }
 
 
-#if USING_COMMAND_STRUCTURE
 /*
  * Command types: "+" , "-" , ">" , "<" , "[" , "," , "." , "S" (S = start)
  * 
@@ -157,68 +156,6 @@ struct Command *build_command_struct(char *code){
     return head;
 }
 
-#else //USING_COMMAND_STRUCTURE
-
-/*
- * O(n) function to get matching brackets -> TODO: replace this with a stack data structure
- */
-int get_matching_close_index(char *string, int index)
-{
-	if (string[index] != '[') {
-		fprintf(stderr,
-			"Interpreter error: char at position %d does not equal '['\n",
-			index);
-		return -ERROR_INTERN;
-	}
-	unsigned int i = index;
-	int opencnt = 0;
-	while (i < strlen(string)) {
-		char cur = string[i];
-		if (cur == '[') {
-			opencnt++;
-		} else if (cur == ']') {
-			opencnt--;
-		}
-		if (opencnt == 0) {
-			return i;
-		}
-		i++;
-	}
-	fprintf(stderr,
-		"Syntax error: no matching close bracket found for char at position %d\n",
-		index);
-	return -ERROR_SYNTAX;
-}
-
-int get_matching_open_index(char *string, int index)
-{
-	if (string[index] != ']') {
-		fprintf(stderr,
-			"Interpreter error: char at position %d does not equal ']'\n",
-			index);
-		return -ERROR_INTERN;
-	}
-	unsigned int i = index;
-	int closecnt = 0;
-	while (i != 0) {
-		char cur = string[i];
-		if (cur == ']') {
-			closecnt++;
-		} else if (cur == '[') {
-			closecnt--;
-		}
-		if (closecnt == 0) {
-			return i;
-		}
-		i--;
-	}
-	fprintf(stderr,
-		"Syntax error: no matching open bracket found for char at position %d\n",
-		index);
-	return -ERROR_SYNTAX;
-}
-
-#endif //USING_COMMAND_STRUCTURE
 
 /*
  * Read a file into heap string
@@ -280,8 +217,8 @@ void bf_destroy_array(CELL * prog_array)
 }
 
 /*
- * Execute brainfuck code: this is still very inefficient.
- * TODO: Optimizations, check array bounds?, dynamic array size?
+ * Execute brainfuck code
+ * TODO: Optimizations, check array bounds?, dynamic array size?, add error handling
  * 
  * Method signature changed on 19.08.2014 to enable interactive mode support
  * 
@@ -295,7 +232,6 @@ void bf_destroy_array(CELL * prog_array)
 
 CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
 {
-#if USING_COMMAND_STRUCTURE
     
     struct Command *command_struct = build_command_struct(program);
 
@@ -337,50 +273,5 @@ CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
         }
     }
     
-#else //USING_COMMAND_STRUCTURE
-    
-	int i = 0;
-	int prev_i;
-	while (i < strlen(program)) {
-		prev_i = i;
-		char token = program[i];
-		switch (token) {
-		case '<':
-			ptr--;
-			break;
-		case '>':
-			ptr++;
-			break;
-		case '+':
-			++*ptr;
-			break;
-		case '-':
-			--*ptr;
-			break;
-		case '.':
-			putchar(*ptr);
-			break;
-		case ',':
-			*ptr = getchar();
-			break;
-		case '[':
-			if (*ptr == 0) {
-				i = get_matching_close_index(program, i);
-			}
-			break;
-		case ']':
-			if (*ptr != 0) {
-				i = get_matching_open_index(program, i);
-			}
-			break;
-		}
-		if (i < 0) {
-			deal_with_error(program, prev_i, prog_array, ptr);
-			return NULL;
-		}
-		i++;
-	}
-    
-#endif //USING_COMMAND_STRUCTURE
 	return ptr;
 }
