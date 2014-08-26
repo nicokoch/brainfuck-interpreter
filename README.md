@@ -1,4 +1,4 @@
-brainfuck-interpreter
+Brainfuck Interpreter
 =====================
 
 A lightweight and fast interpreter for the brainfuck programming language.
@@ -13,19 +13,19 @@ Building
 
 Big TODOs
 ---------
-* Interactive mode (similar to the cpython interpreter)
-* -c option to compile the code
+* Interactive mode improvements (see [#1](https://github.com/Kokxx/brainfuck-interpreter/issues/1))
+* Compile to c/assembly/machinecode
 * Option to enable dynamically sized array (also implement a dynamically sized array)
-* optimizations (i.e. batch shifting/incrementing)
+* more optimizations
 
 Small TODOs
 -----------
-* Optimize loop lookup (preferably use a stack data structure instead of O(n) lookup)
 * Input parameter array size
 * Clean up code
 * Version string
 * Test cases
-* Maybe benchmarking options (or any kind of performance test -> instructions/second?)
+* Maybe benchmarking options (or any kind of performance test)
+* New build system using autotools
 * Anything else you can come up with
 
 Contributing
