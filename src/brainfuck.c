@@ -91,7 +91,7 @@ deal_with_error(char *prog_code, int code_index, CELL * prog_array, CELL * ptr)
 }
 
 /*
- * Command types: "+" , "-" , ">" , "<" , "[" , "," , "." , "S" (S = start)
+ * Command types: "+" , "-" , ">" , "<" , "[" , "," , "." , "S" (S = start), "C" (C = clear)
  * 
  * Example Command Structure
  * String: "++[->+<]>
@@ -138,6 +138,7 @@ struct Command *build_command_struct(char *code)
 			comm->magnitude++;
 			continue;
 		}
+        
 		// If no optimization then create a new command struct with the same parent as the previous
 		struct Command *next =
 		    new_command(code[i], comm->parent_command);
@@ -157,6 +158,7 @@ struct Command *build_command_struct(char *code)
 	return head;
 }
 
+
 /*
  * Free the memory of a command struct linked list created by build_command_struct()
  */
@@ -169,6 +171,30 @@ void destroy_command_struct(struct Command *head)
 		destroy_command_struct(head->next_command);
 	}
 	free(head);
+}
+
+/*
+ * A function that is called upon the commadn struct after it is initally created with the purpose of optimizing and condensing it
+ */
+void optimize_command_struct(struct Command *head)
+{
+    //Recursion is just simply the easiest way to transverse the entire struct
+    if(head->child_command){
+        optimize_command_struct(head->child_command);
+    }
+    if(head->next_command){
+        optimize_command_struct(head->next_command);
+    }
+    
+    if(head->type == '['){
+        struct Command *child = head->child_command->next_command; //Skip over the 'S'
+        
+        if(child->type == '-' && child->next_command->type == ']'){ //Simple clearing pattern
+            head->type = 'C';
+            destroy_command_struct(head->child_command);
+            head->child_command = NULL;
+        }
+    }
 }
 
 /*
@@ -247,6 +273,7 @@ CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
 {
 
 	struct Command *command_struct = build_command_struct(program);
+    optimize_command_struct(command_struct);
 	struct Command *head = command_struct;
 	while (command_struct->next_command) {
 		command_struct = command_struct->next_command;
@@ -257,6 +284,9 @@ CELL *bf_execute(char *program, CELL * prog_array, CELL * ptr)
 		case '-':
 			*ptr -= command_struct->magnitude;
 			break;
+        case 'C':
+            *ptr = 0;
+            break;
 		case '>':
 			ptr += command_struct->magnitude;
 			break;
